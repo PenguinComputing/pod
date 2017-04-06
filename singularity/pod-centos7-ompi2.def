@@ -1,0 +1,42 @@
+BootStrap: yum
+OSVersion: 7
+MirrorURL: http://mirror.centos.org/centos-%{OSVERSION}/%{OSVERSION}/os/$basearch/
+Include: yum
+
+%post
+    # CONFIG
+    PMAKE=0     # 0 runs 'make' on OMPI, any other int runs make -j<int> on OMPI
+
+    # YUM
+    echo "Installing Development and Infiniband Tools"
+    yum -y groupinstall "Development Tools" "Infiniband Support"
+    yum -y install wget vim hostname infinipath-psm infinipath-psm-devel libpsm2 libpsm2-devel
+    yum clean all
+
+    # OMPI
+    echo "Installing OpenMPI 2.0.1 with PSM and PSM2 Support"
+    rm -rf /tmp/ompi
+    mkdir -p /tmp/ompi
+    cd /tmp/ompi
+    wget -N https://www.open-mpi.org/software/ompi/v2.0/downloads/openmpi-2.0.1.tar.gz
+    rm -rf openmpi-2.0.1; tar -xzvf openmpi-2.0.1.tar.gz
+    cd openmpi-2.0.1
+    ./configure --prefix=/usr/local --with-psm --with-psm2
+    [ $PMAKE -eq 0 ] && make || make -j${PMAKE}
+    make install
+    LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+    export LD_LIBRARY_PATH
+    /usr/local/bin/mpicc examples/ring_c.c -o /usr/bin/mpi_ring
+    cd / 
+    rm -rf /tmp/ompi
+
+    # CONTAINER ENVIRONMENT
+    echo "### Penguin Computing POD ###" >> /environment
+    echo "LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:/usr/local/lib" >> /environment
+    echo "export LD_LIBRARY_PATH" >> /environment
+    exit 0
+
+%test
+    df -h /
+
+# vim: syntax=sh:ts=4:sw=4:expandtab
