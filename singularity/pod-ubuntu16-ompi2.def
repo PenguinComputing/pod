@@ -1,0 +1,42 @@
+BootStrap: debootstrap
+OSVersion: xenial
+MirrorURL: http://archive.ubuntu.com/ubuntu/
+Include: bash software-properties-common
+
+%post
+    # CONFIG
+    PMAKE=0     # 0 runs 'make' on OMPI, any other int runs make -j<int> on OMPI
+
+    # APT
+    add-apt-repository "deb http://archive.ubuntu.com/ubuntu xenial main restricted universe"
+    apt-get update
+    apt-get -y install apt-transport-https wget vim g++ gcc gfortran libtool make flex autoconf libpsm-infinipath1-dev libpsm-infinipath1
+    apt-get clean
+
+    # OMPI
+    echo "Installing OpenMPI 2.0.1"
+    rm -rf /tmp/ompi
+    mkdir -p /tmp/ompi
+    cd /tmp/ompi
+    wget -N https://www.open-mpi.org/software/ompi/v2.0/downloads/openmpi-2.0.1.tar.gz
+    rm -rf openmpi-2.0.1; tar -xzvf openmpi-2.0.1.tar.gz
+    cd openmpi-2.0.1
+    ./configure --prefix=/usr/local
+    [ $PMAKE -eq 0 ] && make || make -j${PMAKE}
+    make install
+    LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+    export LD_LIBRARY_PATH
+    /usr/local/bin/mpicc examples/ring_c.c -o /usr/bin/mpi_ring
+    cd / 
+    rm -rf /tmp/ompi
+
+    # CONTAINER ENVIRONMENT
+    echo "### Penguin Computing POD ###" >> /environment
+    echo "LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:/usr/local/lib" >> /environment
+    echo "export LD_LIBRARY_PATH" >> /environment
+    exit 0
+
+%test
+    df -h /
+
+# vim: syntax=sh:ts=4:sw=4:expandtab
