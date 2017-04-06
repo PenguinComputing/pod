@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings name="parallel" xmlns="urn:mathworks.matlab.settings" xsi:schemaLocation="urn:mathworks.matlab.settings settings.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <settings name="profiles">
+        <settings name="POD_remote_r2015a" visible="true">
+            <key name="Description" visible="true">
+                <string>
+                    <value><![CDATA[POD Remote R2015a]]></value>
+                </string>
+            </key>
+            <key name="ProjectComponent" visible="true">
+                <string>
+                    <value><![CDATA[PODProjectComponent_Import_Import]]></value>
+                </string>
+            </key>
+            <key name="SchedulerComponent" visible="true">
+                <string>
+                    <value><![CDATA[GenericProfile1SchedulerComponent2_Import_Import]]></value>
+                </string>
+            </key>
+        </settings>
+    </settings>
+    <settings name="projectcomponents">
+        <settings name="PODProjectComponent_Import_Import" visible="true">
+            <key name="AdditionalPaths" visible="true">
+                <string minArraySize="0" maxArraySize="0" undef="true">
+                </string>
+            </key>
+            <key name="AttachedFiles" visible="true">
+                <string minArraySize="0" maxArraySize="0" undef="true">
+                </string>
+            </key>
+            <key name="AutoAttachFiles" visible="true" anytype="true">
+            </key>
+            <key name="CaptureDiary" visible="true">
+                <bool>
+                    <value>0</value>
+                </bool>
+            </key>
+            <key name="JobFinishedFcn" visible="true" anytype="true">
+            </key>
+            <key name="JobQueuedFcn" visible="true" anytype="true">
+            </key>
+            <key name="JobRunningFcn" visible="true" anytype="true">
+            </key>
+            <key name="JobTimeout" visible="true" anytype="true">
+            </key>
+            <key name="NumWorkersRange" visible="true" anytype="true">
+            </key>
+            <key name="TaskFinishedFcn" visible="true" anytype="true">
+            </key>
+            <key name="TaskRunningFcn" visible="true" anytype="true">
+            </key>
+            <key name="TaskTimeout" visible="true" anytype="true">
+            </key>
+        </settings>
+    </settings>
+    <settings name="schedulercomponents">
+        <settings name="Generic" visible="true">
+            <settings name="GenericProfile1SchedulerComponent2_Import_Import" visible="true">
+                <key name="CancelJobFcn" visible="true" anytype="true">
+                </key>
+                <key name="CancelTaskFcn" visible="true" anytype="true">
+                </key>
+                <key name="ClusterMatlabRoot" visible="true">
+                    <string>
+                        <value><![CDATA[/public/apps/mdcs/R2015a]]></value>
+                    </string>
+                </key>
+                <key name="CommunicatingSubmitFcn" visible="true" anytype="true">
+                    <string>
+                        <value><![CDATA[AAFJTQAAAAAOAAAAiAMAAAYAAAAIAAAAAQAAAAAAAAAFAAAACAAAAAEAAAABAAAAAQAAAAAAAAAOAAAAWAMAAAYAAAAIAAAAEAAAAAAAAAAFAAAACAAAAAEAAAABAAAAAQAAAAAAAAAOAAAAKAMAAAYAAAAIAAAAAgAAAAAAAAAFAAAACAAAAAEAAAABAAAAAQAAAAAAAAAFAAQAEAAAAAEAAABAAAAAbWF0bGFicm9vdAAAAAAAAHNlcGFyYXRvcgAAAAAAAABzZW50aW5lbAAAAAAAAAAAZnVuY3Rpb25faGFuZGxlAA4AAABQAAAABgAAAAgAAAAEAAAAAAAAAAUAAAAIAAAAAQAAAB4AAAABAAAAAAAAABAAAAAeAAAAQzpcUHJvZ3JhbSBGaWxlc1xNQVRMQUJcUjIwMTNiAAAOAAAAMAAAAAYAAAAIAAAABAAAAAAAAAAFAAAACAAAAAEAAAABAAAAAQAAAAAAAAAQAAEAXAAAAA4AAAAwAAAABgAAAAgAAAAEAAAAAAAAAAUAAAAIAAAAAQAAAAEAAAABAAAAAAAAABAAAQBAAAAADgAAAOABAAAGAAAACAAAAAIAAAAAAAAABQAAAAgAAAABAAAAAQAAAAEAAAAAAAAABQAEAAkAAAABAAAAJAAAAGZ1bmN0aW9uAHR5cGUAAAAAAGZpbGUAAAAAAGNsYXNzAAAAAAAAAAAOAAAASAAAAAYAAAAIAAAABAAAAAAAAAAFAAAACAAAAAEAAAAWAAAAAQAAAAAAAAAQAAAAFgAAAGNvbW11bmljYXRpbmdTdWJtaXRGY24AAA4AAABAAAAABgAAAAgAAAAEAAAAAAAAAAUAAAAIAAAAAQAAAAsAAAABAAAAAAAAABAAAAALAAAAY2xhc3NzaW1wbGUAAAAAAA4AAACQAAAABgAAAAgAAAAEAAAAAAAAAAUAAAAIAAAAAQAAAFsAAAABAAAAAAAAABAAAABbAAAASDpcbWF0bGFiXHVzZXJzXHBlbmd1aW5camFtZXMtY29ua2xpblxzY3JpcHRzXFIyMDEzYlxyZW1vdGVcbWF0bGFiXGNvbW11bmljYXRpbmdTdWJtaXRGY24ubQAAAAAADgAAAEgAAAAGAAAACAAAAAQAAAAAAAAABQAAAAgAAAABAAAAFAAAAAEAAAAAAAAAEAAAABQAAABkaXN0Y29tcC50eXBlY2hlY2tlcgAAAAA=]]></value>
+                    </string>
+                </key>
+                <key name="DeleteJobFcn" visible="true">
+                    <string>
+                        <value><![CDATA[AAFJTQAAAAAOAAAAIAMAAAYAAAAIAAAAEAAAAAAAAAAFAAAACAAAAAEAAAABAAAAAQAAAAAAAAAOAAAA8AIAAAYAAAAIAAAAAgAAAAAAAAAFAAAACAAAAAEAAAABAAAAAQAAAAAAAAAFAAQAEAAAAAEAAABAAAAAbWF0bGFicm9vdAAAAAAAAHNlcGFyYXRvcgAAAAAAAABzZW50aW5lbAAAAAAAAAAAZnVuY3Rpb25faGFuZGxlAA4AAABIAAAABgAAAAgAAAAEAAAAAAAAAAUAAAAIAAAAAQAAABgAAAABAAAAAAAAABAAAAAYAAAAL3Vzci9sb2NhbC9NQVRMQUIvUjIwMTNiDgAAADAAAAAGAAAACAAAAAQAAAAAAAAABQAAAAgAAAABAAAAAQAAAAEAAAAAAAAAEAABAC8AAAAOAAAAMAAAAAYAAAAIAAAABAAAAAAAAAAFAAAACAAAAAEAAAABAAAAAQAAAAAAAAAQAAEAQAAAAA4AAACwAQAABgAAAAgAAAACAAAAAAAAAAUAAAAIAAAAAQAAAAEAAAABAAAAAAAAAAUABAAJAAAAAQAAACQAAABmdW5jdGlvbgB0eXBlAAAAAABmaWxlAAAAAABjbGFzcwAAAAAAAAAADgAAAEAAAAAGAAAACAAAAAQAAAAAAAAABQAAAAgAAAABAAAADAAAAAEAAAAAAAAAEAAAAAwAAABkZWxldGVKb2JGY24AAAAADgAAAEAAAAAGAAAACAAAAAQAAAAAAAAABQAAAAgAAAABAAAACwAAAAEAAAAAAAAAEAAAAAsAAABjbGFzc3NpbXBsZQAAAAAADgAAAGgAAAAGAAAACAAAAAQAAAAAAAAABQAAAAgAAAABAAAANwAAAAEAAAAAAAAAEAAAADcAAAAvaG9tZS9qY29uay9Eb2N1bWVudHMvTUFUTEFCL3BvZF9zY3JpcHRzL2RlbGV0ZUpvYkZjbi5tAA4AAABIAAAABgAAAAgAAAAEAAAAAAAAAAUAAAAIAAAAAQAAABQAAAABAAAAAAAAABAAAAAUAAAAZGlzdGNvbXAudHlwZWNoZWNrZXIAAAAA]]></value>
+                    </string>
+                </key>
+                <key name="DeleteTaskFcn" visible="true" anytype="true">
+                </key>
+                <key name="GetJobStateFcn" visible="true">
+                    <string>
+                        <value><![CDATA[AAFJTQAAAAAOAAAA6AIAAAYAAAAIAAAAEAAAAAAAAAAFAAAACAAAAAEAAAABAAAAAQAAAAAAAAAOAAAAuAIAAAYAAAAIAAAAAgAAAAAAAAAFAAAACAAAAAEAAAABAAAAAQAAAAAAAAAFAAQAEAAAAAEAAABAAAAAbWF0bGFicm9vdAAAAAAAAHNlcGFyYXRvcgAAAAAAAABzZW50aW5lbAAAAAAAAAAAZnVuY3Rpb25faGFuZGxlAA4AAABIAAAABgAAAAgAAAAEAAAAAAAAAAUAAAAIAAAAAQAAABgAAAABAAAAAAAAABAAAAAYAAAAL3Vzci9sb2NhbC9NQVRMQUIvUjIwMTNiDgAAADAAAAAGAAAACAAAAAQAAAAAAAAABQAAAAgAAAABAAAAAQAAAAEAAAAAAAAAEAABAC8AAAAOAAAAMAAAAAYAAAAIAAAABAAAAAAAAAAFAAAACAAAAAEAAAABAAAAAQAAAAAAAAAQAAEAQAAAAA4AAAB4AQAABgAAAAgAAAACAAAAAAAAAAUAAAAIAAAAAQAAAAEAAAABAAAAAAAAAAUABAAJAAAAAQAAACQAAABmdW5jdGlvbgB0eXBlAAAAAABmaWxlAAAAAABjbGFzcwAAAAAAAAAADgAAAEAAAAAGAAAACAAAAAQAAAAAAAAABQAAAAgAAAABAAAADgAAAAEAAAAAAAAAEAAAAA4AAABnZXRKb2JTdGF0ZUZjbgAADgAAAEAAAAAGAAAACAAAAAQAAAAAAAAABQAAAAgAAAABAAAACwAAAAEAAAAAAAAAEAAAAAsAAABjbGFzc3NpbXBsZQAAAAAADgAAADAAAAAGAAAACAAAAAQAAAAAAAAABQAAAAgAAAAAAAAAAAAAAAEAAAAAAAAAEAAAAAAAAAAOAAAASAAAAAYAAAAIAAAABAAAAAAAAAAFAAAACAAAAAEAAAAUAAAAAQAAAAAAAAAQAAAAFAAAAGRpc3Rjb21wLnR5cGVjaGVja2VyAAAAAA==]]></value>
+                    </string>
+                </key>
+                <key name="HasSharedFilesystem" visible="true">
+                    <bool>
+                        <value>0</value>
+                    </bool>
+                </key>
+                <key name="IndependentSubmitFcn" visible="true" anytype="true">
+                    <string>
+                        <value><![CDATA[AAFJTQAAAAAOAAAAiAMAAAYAAAAIAAAAAQAAAAAAAAAFAAAACAAAAAEAAAABAAAAAQAAAAAAAAAOAAAAWAMAAAYAAAAIAAAAEAAAAAAAAAAFAAAACAAAAAEAAAABAAAAAQAAAAAAAAAOAAAAKAMAAAYAAAAIAAAAAgAAAAAAAAAFAAAACAAAAAEAAAABAAAAAQAAAAAAAAAFAAQAEAAAAAEAAABAAAAAbWF0bGFicm9vdAAAAAAAAHNlcGFyYXRvcgAAAAAAAABzZW50aW5lbAAAAAAAAAAAZnVuY3Rpb25faGFuZGxlAA4AAABQAAAABgAAAAgAAAAEAAAAAAAAAAUAAAAIAAAAAQAAAB4AAAABAAAAAAAAABAAAAAeAAAAQzpcUHJvZ3JhbSBGaWxlc1xNQVRMQUJcUjIwMTNiAAAOAAAAMAAAAAYAAAAIAAAABAAAAAAAAAAFAAAACAAAAAEAAAABAAAAAQAAAAAAAAAQAAEAXAAAAA4AAAAwAAAABgAAAAgAAAAEAAAAAAAAAAUAAAAIAAAAAQAAAAEAAAABAAAAAAAAABAAAQBAAAAADgAAAOABAAAGAAAACAAAAAIAAAAAAAAABQAAAAgAAAABAAAAAQAAAAEAAAAAAAAABQAEAAkAAAABAAAAJAAAAGZ1bmN0aW9uAHR5cGUAAAAAAGZpbGUAAAAAAGNsYXNzAAAAAAAAAAAOAAAASAAAAAYAAAAIAAAABAAAAAAAAAAFAAAACAAAAAEAAAAUAAAAAQAAAAAAAAAQAAAAFAAAAGluZGVwZW5kZW50U3VibWl0RmNuAAAAAA4AAABAAAAABgAAAAgAAAAEAAAAAAAAAAUAAAAIAAAAAQAAAAsAAAABAAAAAAAAABAAAAALAAAAY2xhc3NzaW1wbGUAAAAAAA4AAACQAAAABgAAAAgAAAAEAAAAAAAAAAUAAAAIAAAAAQAAAFkAAAABAAAAAAAAABAAAABZAAAASDpcbWF0bGFiXHVzZXJzXHBlbmd1aW5camFtZXMtY29ua2xpblxzY3JpcHRzXFIyMDEzYlxyZW1vdGVcbWF0bGFiXGluZGVwZW5kZW50U3VibWl0RmNuLm0AAAAAAAAADgAAAEgAAAAGAAAACAAAAAQAAAAAAAAABQAAAAgAAAABAAAAFAAAAAEAAAAAAAAAEAAAABQAAABkaXN0Y29tcC50eXBlY2hlY2tlcgAAAAA=]]></value>
+                    </string>
+                </key>
+                <key name="JobStorageLocation" visible="true">
+                    <string minArraySize="0" maxArraySize="0" undef="true">
+                    </string>
+                </key>
+                <key name="LicenseNumber" visible="true" anytype="true">
+                </key>
+                <key name="NumWorkers" visible="true" anytype="true">
+                    <double>
+                        <value>48.0</value>
+                    </double>
+                </key>
+                <key name="OperatingSystem" visible="true" anytype="true">
+                    <string>
+                        <value><![CDATA[unix]]></value>
+                    </string>
+                </key>
+                <key name="RequiresMathWorksHostedLicensing" visible="true" anytype="true">
+                    <bool>
+                        <value>1</value>
+                    </bool>
+                </key>
+            </settings>
+        </settings>
+    </settings>
+</settings>
