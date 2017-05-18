@@ -10,7 +10,7 @@ From a remote system, with root access:
 ```
 sudo singularity create --size 1512 ./pod-centos7-ompi2.img
 sudo singularity bootstrap ./pod-centos7-ompi2.img ./pod-centos7-ompi2.def
-rsync -azvH ./pod-centos7-ompi2.img <pod username>@<loginnode ip>:~/
+rsync -azvH ./pod-centos7-ompi2.img <pod_username>@<loginnode_ip>:~/
 ```
 
 ## Running Singularity Images on POD
@@ -42,4 +42,13 @@ qsub -I -q B30 -l nodes=2:ppn=28,walltime=00:15:00
 module load singularity
 module load openmpi/2.0.1/gcc.6.2.0
 mpirun singularity exec pod-centos7-ompi2.img /usr/bin/mpi_ring
+```
+
+### pod-pod-centos7-R-openblas-lapack.def
+
+```
+qsub -I -q B30 -l nodes=1:ppn=28,walltime=00:15:00
+module load singularity
+singularity exec pod-centos7-R-openblas-lapack.img R --version
+singularity exec pod-centos7-R-openblas-lapack.img R CMD BATCH myscript.R
 ```

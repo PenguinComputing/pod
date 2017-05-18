@@ -1,0 +1,126 @@
+BootStrap: yum
+OSVersion: 7
+MirrorURL: http://mirror.centos.org/centos-%{OSVERSION}/%{OSVERSION}/os/$basearch/
+Include: yum
+
+%post
+    ##########################################################################
+    # CONFIG AND PREP
+    ##########################################################################
+    
+    # CONFIG
+    PMAKE=3     # 0 runs 'make', any other int runs make -j<int>
+    BUILDROOT=/tmp/build
+
+    # YUM PREP
+    yum -y install deltarpm
+    yum -y update
+    yum clean all
+
+    echo "Installing Development Tools"
+    yum -y groupinstall development --setopt=group_package_types=mandatory,default
+    yum -y install gcc-gfortran cmake wget git hostname ed
+    yum clean all
+
+    ##########################################################################
+    # APPLICATIONS
+    ##########################################################################
+
+    # COMPILER CONFIG FOR APPS
+    export MPIHOME=/usr/local
+    export CC=gcc CXX=g++ FC=gfortran F77=gfortran F90=gfortran
+    export CFLAGS='-mtune=native -march=native'
+    export CPPFLAGS='-mtune=native -march=native'
+    export FFLAGS='-mtune=native -march=native'
+
+    #
+    # OPENBLAS
+    #
+    mkdir -p $BUILDROOT && cd $BUILDROOT || exit 1
+    rm -rf OpenBLAS
+    git clone -b v0.2.19 https://github.com/xianyi/OpenBLAS.git
+    cd OpenBLAS
+    [ $PMAKE -eq 0 ] && make TARGET=x86_64 -j${PMAKE} || make TARGET=x86_64
+    make PREFIX=/usr/local/ install
+    cd / && rm -rf $BUILDROOT
+
+    #
+    # LAPACK
+    #
+    mkdir -p $BUILDROOT && cd $BUILDROOT || exit 1
+    rm -rf lapack-3.7.0.tgz lapack-sandbox
+    wget http://www.netlib.org/lapack/lapack-3.7.0.tgz
+    mkdir lapack-sandbox
+    cd lapack-sandbox
+    mkdir lapack-build
+    tar -xzvf ../lapack-3.7.0.tgz 
+    cd lapack-build
+    cmake ../lapack-3.7.0 -DCMAKE_Fortran_FLAGS="$FFLAGS" \
+                          -DBUILD_SINGLE=1 -DBUILD_DOUBLE=1 -DBUILD_COMPLEX=1 \
+                          -DBUILD_COMPLEX16=1 -DBUILD_SHARED_LIBS=on
+    [ $PMAKE -eq 0 ] && make -j${PMAKE} || make 
+    cp -a lib/* /usr/local/lib/
+    cd / && rm -rf $BUILDROOT
+    
+    #
+    # R 
+    #
+    mkdir -p $BUILDROOT && cd $BUILDROOT || exit 1
+    rm -rf R-3.3.3.tar.gz R-3.3.3
+    wget https://cran.cnr.berkeley.edu/src/base/R-3/R-3.3.3.tar.gz
+    tar xzvf R-3.3.3.tar.gz
+    cd R-3.3.3
+
+    # requirements for R
+    yum -y install zlib-devel bzip2-devel bzip2-libs readline-devel \
+                   xz-devel xz-libs pcre-devel libcurl-devel \
+                   libpng-devel libjpeg-devel libtiff-devel openssl-devel
+    yum clean all
+
+    ./configure --prefix=/usr/local --with-blas --with-lapack --with-x=no --enable-R-shlib
+    [ $PMAKE -eq 0 ] && make -j${PMAKE} || make 
+    make install
+    cd / && rm -rf $BUILDROOT
+
+    #
+    # R MODULES
+    #
+    mkdir -p $BUILDROOT && cd $BUILDROOT || exit 1
+    RMODULES=installer.R
+    cat<<EOF>$RMODULES
+# define mirror
+local({
+  r <- getOption("repos")
+  r["CRAN"] <- "http://cran.us.r-project.org"
+  options(repos = r)
+})
+
+# Common modules
+install.packages(c("devtools","Rcpp","plyr","ggplot2"))
+
+# Bioconductor
+source("https://bioconductor.org/biocLite.R")
+biocLite()
+biocValid()
+EOF
+    export PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:$PATH
+    export LD_LIBRARY_PATH=/usr/local/lib:/usr/local/lib64:$LD_LIBRARY_PATH
+    R --slave -f $RMODULES
+    cd / && rm -rf $BUILDROOT
+
+    ##########################################################################
+    # CONTAINER ENVIRONMENT
+    ##########################################################################
+
+    echo >> /environment
+    echo "### Penguin Computing POD ###" >> /environment
+    echo "LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:/usr/local/lib" >> /environment
+    echo "export LD_LIBRARY_PATH" >> /environment
+    exit 0
+
+%test
+    export PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:$PATH
+    export LD_LIBRARY_PATH=/usr/local/lib:/usr/local/lib64:$LD_LIBRARY_PATH
+    R --version
+
+# vim:syntax=sh sw=4 ts=4 et
