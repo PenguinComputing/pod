@@ -1,54 +1,28 @@
-
 # POD Singularity Examples
 
-Official Singularity Documentation: http://singularity.lbl.gov/
+* POD Singularity Documentation: https://pod.penguincomputing.com/documentation/Singularity
 
-## Bootstrap Example
+### Bootstrap  Examples
+See the README comments in each bootstrap definition for instructions.
 
-From a remote system, with root access:
+* **pod-centos7-ompi2.def**
+CentOS 7 with OpenMPI 2 and PSM2 MPI transport support
 
-```
-sudo singularity create --size 1512 ./pod-centos7-ompi2.img
-sudo singularity bootstrap ./pod-centos7-ompi2.img ./pod-centos7-ompi2.def
-rsync -azvH ./pod-centos7-ompi2.img <pod_username>@<loginnode_ip>:~/
-```
+* **pod-centos7-R**
+CentOS 7 with R, common R modules and LAPACK/OpenBLAS support
 
-## Running Singularity Images on POD
+* **pod-ubuntu16-ompi2.def**
+Ubuntu 16 with OpenMPI 2 over IPoIB (tcp/ip)
 
-The following examples use interactive qsub sessions on B30 class nodes, but an interactive session is not required to use singularity.  Singularity can be used inside a standard job submission script.
+* **pod-ubuntu17-ompi2.def**
+Ubuntu 17 with OpenMPI 2 and PSM2 MPI transport support
 
-### pod-centos7-ompi2.def
+### Job Scripts
 
-```
-qsub -I -q B30 -l nodes=2:ppn=28,walltime=00:15:00
-module load singularity
-module load openmpi/2.0.1/gcc.4.8.5
-mpirun singularity exec pod-centos7-ompi2.img /usr/bin/mpi_ring
-```
+See the jobscripts folder for example POD job scripts for each container example.
 
-### pod-ubuntu16-ompi2.def
+### Singularity Resources
 
-```
-qsub -I -q B30 -l nodes=2:ppn=28,walltime=00:15:00
-module load singularity
-module load openmpi/2.0.1/gcc.6.2.0
-mpirun -mca btl_tcp_if_include ib0 -mca btl tcp,sm,self singularity exec pod-centos7-ompi2.img /usr/bin/mpi_ring
-```
+* Official Singularity Documentation: http://singularity.lbl.gov/
 
-### pod-ubuntu17-ompi2.def
-
-```
-qsub -I -q B30 -l nodes=2:ppn=28,walltime=00:15:00
-module load singularity
-module load openmpi/2.0.1/gcc.6.2.0
-mpirun singularity exec pod-centos7-ompi2.img /usr/bin/mpi_ring
-```
-
-### pod-pod-centos7-R-openblas-lapack.def
-
-```
-qsub -I -q B30 -l nodes=1:ppn=28,walltime=00:15:00
-module load singularity
-singularity exec pod-centos7-R-openblas-lapack.img R --version
-singularity exec pod-centos7-R-openblas-lapack.img R CMD BATCH myscript.R
-```
+* Singularity Mailing List: https://groups.google.com/a/lbl.gov/forum/#!forum/singularity
