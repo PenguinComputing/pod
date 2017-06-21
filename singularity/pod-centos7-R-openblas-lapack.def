@@ -1,7 +1,35 @@
+#############################################################################
+# README 
+#
+# === Create Container
+#
+# singularity create --size 1500 ./pod-centos7-R.img
+# sudo singularity bootstrap ./pod-centos7-R.img ./pod-centos7-R.def
+#
+# === Required POD Modules
+#
+# module load singularity
+#
+# === Provides
+#
+# OpenBLAS:   /usr/local/lib
+# LAPACK:     /usr/local/lib
+# R 3.3.3:    /usr/local/bin
+# R Modules:  devtools, Rcpp, plyr, ggplot2, bioconductor
+#
+#############################################################################
+
 BootStrap: yum
 OSVersion: 7
 MirrorURL: http://mirror.centos.org/centos-%{OSVERSION}/%{OSVERSION}/os/$basearch/
 Include: yum
+
+%environment
+PATH=/usr/local/sbin:/usr/local/bin:$PATH
+LD_LIBRARY_PATH=/usr/local/lib64:/usr/local/lib:$LD_LIBRARY_PATH
+
+%labels
+AUTHOR Penguin Computing
 
 %post
     ##########################################################################
@@ -9,18 +37,19 @@ Include: yum
     ##########################################################################
     
     # CONFIG
-    PMAKE=3     # 0 runs 'make', any other int runs make -j<int>
-    BUILDROOT=/tmp/build
+    PMAKE=2     # 0 runs 'make', any other int runs make -j<int>
+    BUILD_DIR=/tmp/build
 
     # YUM PREP
-    yum -y install deltarpm
-    yum -y update
+    yum -y install gcc gcc-gfortran gcc-c++ libtool make flex autoconf wget hostname git cmake ed
     yum clean all
 
-    echo "Installing Development Tools"
-    yum -y groupinstall development --setopt=group_package_types=mandatory,default
-    yum -y install gcc-gfortran cmake wget git hostname ed
-    yum clean all
+    # BUILD ENV
+    rm -rf $BUILD_DIR
+    mkdir -p $BUILD_DIR
+
+    export PATH=/usr/local/sbin:/usr/local/bin:$PATH
+    export LD_LIBRARY_PATH=/usr/local/lib64:/usr/local/lib:$LD_LIBRARY_PATH
 
     ##########################################################################
     # APPLICATIONS
@@ -36,19 +65,16 @@ Include: yum
     #
     # OPENBLAS
     #
-    mkdir -p $BUILDROOT && cd $BUILDROOT || exit 1
-    rm -rf OpenBLAS
+    cd $BUILD_DIR
     git clone -b v0.2.19 https://github.com/xianyi/OpenBLAS.git
     cd OpenBLAS
-    [ $PMAKE -eq 0 ] && make TARGET=x86_64 -j${PMAKE} || make TARGET=x86_64
+    [ $PMAKE -eq 0 ] && make TARGET=x86_64 || make TARGET=x86_64 -j${PMAKE}
     make PREFIX=/usr/local/ install
-    cd / && rm -rf $BUILDROOT
 
     #
     # LAPACK
     #
-    mkdir -p $BUILDROOT && cd $BUILDROOT || exit 1
-    rm -rf lapack-3.7.0.tgz lapack-sandbox
+    cd $BUILD_DIR
     wget http://www.netlib.org/lapack/lapack-3.7.0.tgz
     mkdir lapack-sandbox
     cd lapack-sandbox
@@ -58,15 +84,13 @@ Include: yum
     cmake ../lapack-3.7.0 -DCMAKE_Fortran_FLAGS="$FFLAGS" \
                           -DBUILD_SINGLE=1 -DBUILD_DOUBLE=1 -DBUILD_COMPLEX=1 \
                           -DBUILD_COMPLEX16=1 -DBUILD_SHARED_LIBS=on
-    [ $PMAKE -eq 0 ] && make -j${PMAKE} || make 
+    [ $PMAKE -eq 0 ] && make || make -j${PMAKE}
     cp -a lib/* /usr/local/lib/
-    cd / && rm -rf $BUILDROOT
     
     #
     # R 
     #
-    mkdir -p $BUILDROOT && cd $BUILDROOT || exit 1
-    rm -rf R-3.3.3.tar.gz R-3.3.3
+    cd $BUILD_DIR
     wget https://cran.cnr.berkeley.edu/src/base/R-3/R-3.3.3.tar.gz
     tar xzvf R-3.3.3.tar.gz
     cd R-3.3.3
@@ -78,14 +102,13 @@ Include: yum
     yum clean all
 
     ./configure --prefix=/usr/local --with-blas --with-lapack --with-x=no --enable-R-shlib
-    [ $PMAKE -eq 0 ] && make -j${PMAKE} || make 
+    [ $PMAKE -eq 0 ] && make || make -j${PMAKE}
     make install
-    cd / && rm -rf $BUILDROOT
 
     #
     # R MODULES
     #
-    mkdir -p $BUILDROOT && cd $BUILDROOT || exit 1
+    cd $BUILD_DIR
     RMODULES=installer.R
     cat<<EOF>$RMODULES
 # define mirror
@@ -103,24 +126,10 @@ source("https://bioconductor.org/biocLite.R")
 biocLite()
 biocValid()
 EOF
-    export PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:$PATH
-    export LD_LIBRARY_PATH=/usr/local/lib:/usr/local/lib64:$LD_LIBRARY_PATH
     R --slave -f $RMODULES
-    cd / && rm -rf $BUILDROOT
 
-    ##########################################################################
-    # CONTAINER ENVIRONMENT
-    ##########################################################################
+    # CLEANUP
+    cd / 
+    rm -rf $BUILD_DIR
 
-    echo >> /environment
-    echo "### Penguin Computing POD ###" >> /environment
-    echo "LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:/usr/local/lib" >> /environment
-    echo "export LD_LIBRARY_PATH" >> /environment
-    exit 0
-
-%test
-    export PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:$PATH
-    export LD_LIBRARY_PATH=/usr/local/lib:/usr/local/lib64:$LD_LIBRARY_PATH
-    R --version
-
-# vim:syntax=sh sw=4 ts=4 et
+# vim: syntax=sh:ts=4:sw=4:expandtab

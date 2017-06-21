@@ -1,56 +1,82 @@
+#############################################################################
+# README 
+#
+# === Create Container
+#
+# singularity create --size 900 ./pod-ubuntu17-ompi2.img
+# sudo singularity bootstrap ./pod-ubuntu17-ompi2.img ./pod-ubuntu17-ompi2.def
+#
+# === Required POD Modules
+#
+# module load singularity
+# module load openmpi/2.0.1/gcc.4.9.0
+#
+# === Provides
+#
+# OpenMPI 2.0.1: /usr/local/bin, /usr/local/lib
+# MPI Example:   /usr/bin/mpi_ring
+#
+#############################################################################
+
 BootStrap: debootstrap
 OSVersion: zesty
 MirrorURL: http://archive.ubuntu.com/ubuntu/
-Include: bash software-properties-common
+Include: software-properties-common
+
+%environment
+PATH=/usr/local/sbin:/usr/local/bin:$PATH
+LD_LIBRARY_PATH=/usr/local/lib64:/usr/local/lib:$LD_LIBRARY_PATH
+
+%labels
+AUTHOR Penguin Computing
 
 %post
+    ##########################################################################
+    # CONFIG AND PREP
+    ##########################################################################
+    
     # CONFIG
-    PMAKE=0     # 0 runs 'make' on OMPI, any other int runs make -j<int> on OMPI
-
-    # ENABLE USR/LOCAL
-    PATH=/usr/local/bin:$PATH
-    LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
-    export PATH LD_LIBRARY_PATH 
+    BUILD_DIR=/tmp/build    # temp build folder inside the container
+    PMAKE=2                 # 0 runs 'make', any other int runs 'make -j<int>'
 
     # APT
     add-apt-repository "deb http://archive.ubuntu.com/ubuntu zesty main restricted universe"
     apt-get update
-    apt-get -y install apt-transport-https wget vim g++ gcc gfortran libtool make flex autoconf libpsm-infinipath1-dev libpsm-infinipath1 git uuid-dev
+    apt-get -y install apt-transport-https wget g++ gcc gfortran libtool libtool-bin make flex autoconf libpsm-infinipath1-dev libpsm-infinipath1 git uuid-dev
     apt-get clean
 
+    # BUILD ENV
+    rm -rf $BUILD_DIR
+    mkdir -p $BUILD_DIR
+
+    export PATH=/usr/local/sbin:/usr/local/bin:$PATH
+    export LD_LIBRARY_PATH=/usr/local/lib64:/usr/local/lib:$LD_LIBRARY_PATH
+
+    ##########################################################################
+    # APPLICATIONS
+    ##########################################################################
+
     # PSM2
-    # IMPORTANT - LIBDIR must be set to avoid collision with host OS libpsm2.so in /usr
-    mkdir -p /tmp/psm2 && cd /tmp/psm2
-    rm -rf opa-psm2
+    cd $BUILD_DIR
     git clone https://github.com/01org/opa-psm2.git
     cd opa-psm2
+    # LIBDIR must be set to avoid collision with host OS libpsm2.so in /usr
     make install LIBDIR=/usr/local/lib
-    cd /
-    rm -rf /tmp/psm2
+
+    echo $LD_LIBRARY_PATH
 
     # OMPI
-    echo "Installing OpenMPI 2.0.1 with PSM and PSM2 Support"
-    rm -rf /tmp/ompi
-    mkdir -p /tmp/ompi
-    cd /tmp/ompi
+    cd $BUILD_DIR
     wget -N https://www.open-mpi.org/software/ompi/v2.0/downloads/openmpi-2.0.1.tar.gz
-    rm -rf openmpi-2.0.1; tar -xzvf openmpi-2.0.1.tar.gz
+    tar -xzvf openmpi-2.0.1.tar.gz
     cd openmpi-2.0.1
     ./configure --prefix=/usr/local --with-psm --with-psm2
     [ $PMAKE -eq 0 ] && make || make -j${PMAKE}
     make install
     /usr/local/bin/mpicc examples/ring_c.c -o /usr/bin/mpi_ring
+
+    # CLEANUP
     cd / 
-    rm -rf /tmp/ompi
-
-    # CONTAINER ENVIRONMENT
-    echo " " >> /environment
-    echo "### Penguin Computing POD ###" >> /environment
-    echo "LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:/usr/local/lib" >> /environment
-    echo "export LD_LIBRARY_PATH" >> /environment
-    exit 0
-
-%test
-    df -h /
+    rm -rf $BUILD_DIR
 
 # vim: syntax=sh:ts=4:sw=4:expandtab
