@@ -1,0 +1,52 @@
+#############################################################################
+# README 
+#
+# === Create Container
+#
+# singularity create --size 1500 ./pod-ubuntu16-jupyter.img
+# sudo singularity bootstrap ./pod-ubuntu16-jupyter.img pod-ubuntu16-jupyter.def
+#
+# === Required POD Modules
+#
+# module load singularity
+#
+# === Provides
+#
+# IPython for Python 2 and 3:           /usr/local/bin
+# Jupyter Notebook for Python 2 and 3:  /usr/local/bin
+# PIP for Python 2 and 3:               /usr/local/bin
+#
+#############################################################################
+
+BootStrap: debootstrap
+OSVersion: xenial
+MirrorURL: http://archive.ubuntu.com/ubuntu/
+Include: software-properties-common
+
+%environment
+PATH=/usr/local/sbin:/usr/local/bin:$PATH
+LD_LIBRARY_PATH=/usr/local/lib64:/usr/local/lib:$LD_LIBRARY_PATH
+LC_ALL=C
+
+%labels
+AUTHOR Penguin Computing
+
+%post
+    # APT
+    add-apt-repository "deb http://archive.ubuntu.com/ubuntu xenial main restricted universe"
+    apt-get update
+    apt-get -y install python3-pip python-pip
+    apt-get clean
+
+    export LC_ALL=C
+
+    # PYTHON 3
+    pip3 install --upgrade pip
+    pip3 install jupyter jupyter-tools
+
+    # PYTHON 2
+    pip install --upgrade pip
+    pip install jupyter jupyter-tools
+
+
+# vim: syntax=sh:ts=4:sw=4:expandtab
