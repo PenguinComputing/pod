@@ -3,26 +3,24 @@
 #
 # === Create Container
 #
-# singularity create --size 1500 ./pod-centos7-R.img
-# sudo singularity bootstrap ./pod-centos7-R.img ./pod-centos7-R.def
+# sudo singularity build --sandbox ./pod-R-bioconductor ./pod-R-bioconductor.def
+# sudo singularity build ./pod-R-bioconductor.img ./pod-R-bioconductor
 #
 # === Required POD Modules
 #
 # module load singularity
 #
-# === Provides
+# === Provides in /usr/local
 #
-# OpenBLAS:   /usr/local/lib
-# LAPACK:     /usr/local/lib
-# R 3.3.3:    /usr/local/bin
-# R Modules:  devtools, Rcpp, plyr, ggplot2, bioconductor
+# OpenBLAS      - http://www.openblas.net/
+# LAPACK        - http://www.netlib.org/lapack/
+# R 3.3.3       - https://www.r-project.org/
+# R Modules:    devtools, Rcpp, plyr, ggplot2, bioconductor
 #
 #############################################################################
 
-BootStrap: yum
-OSVersion: 7
-MirrorURL: http://mirror.centos.org/centos-%{OSVERSION}/%{OSVERSION}/os/$basearch/
-Include: yum
+Bootstrap: docker
+From: centos:7
 
 %environment
 PATH=/usr/local/sbin:/usr/local/bin:$PATH
@@ -32,48 +30,37 @@ LD_LIBRARY_PATH=/usr/local/lib64:/usr/local/lib:$LD_LIBRARY_PATH
 AUTHOR Penguin Computing
 
 %post
-    ##########################################################################
-    # CONFIG AND PREP
-    ##########################################################################
-    
-    # CONFIG
-    PMAKE=2     # 0 runs 'make', any other int runs make -j<int>
-    BUILD_DIR=/tmp/build
+    BUILD_DIR=/tmp/build    # temp build folder inside the container
 
-    # YUM PREP
+    # yum
     yum -y install gcc gcc-gfortran gcc-c++ libtool make flex autoconf wget hostname git cmake ed
-    yum clean all
 
-    # BUILD ENV
-    rm -rf $BUILD_DIR
+    # requirements for R
+    yum -y install zlib-devel bzip2-devel bzip2-libs readline-devel \
+                   xz-devel xz-libs pcre-devel libcurl-devel \
+                   libpng-devel libjpeg-devel libtiff-devel openssl-devel
+
+    # build environment
     mkdir -p $BUILD_DIR
 
     export PATH=/usr/local/sbin:/usr/local/bin:$PATH
     export LD_LIBRARY_PATH=/usr/local/lib64:/usr/local/lib:$LD_LIBRARY_PATH
 
-    ##########################################################################
-    # APPLICATIONS
-    ##########################################################################
-
-    # COMPILER CONFIG FOR APPS
+    # compiler options
     export MPIHOME=/usr/local
     export CC=gcc CXX=g++ FC=gfortran F77=gfortran F90=gfortran
     export CFLAGS='-mtune=native -march=native'
     export CPPFLAGS='-mtune=native -march=native'
     export FFLAGS='-mtune=native -march=native'
 
-    #
-    # OPENBLAS
-    #
+    # openblas
     cd $BUILD_DIR
     git clone -b v0.2.19 https://github.com/xianyi/OpenBLAS.git
     cd OpenBLAS
-    [ $PMAKE -eq 0 ] && make TARGET=x86_64 || make TARGET=x86_64 -j${PMAKE}
+    make TARGET=x86_64
     make PREFIX=/usr/local/ install
 
-    #
-    # LAPACK
-    #
+    # lapack
     cd $BUILD_DIR
     wget http://www.netlib.org/lapack/lapack-3.7.0.tgz
     mkdir lapack-sandbox
@@ -84,30 +71,19 @@ AUTHOR Penguin Computing
     cmake ../lapack-3.7.0 -DCMAKE_Fortran_FLAGS="$FFLAGS" \
                           -DBUILD_SINGLE=1 -DBUILD_DOUBLE=1 -DBUILD_COMPLEX=1 \
                           -DBUILD_COMPLEX16=1 -DBUILD_SHARED_LIBS=on
-    [ $PMAKE -eq 0 ] && make || make -j${PMAKE}
+    make
     cp -a lib/* /usr/local/lib/
     
-    #
     # R 
-    #
     cd $BUILD_DIR
     wget https://cran.cnr.berkeley.edu/src/base/R-3/R-3.3.3.tar.gz
     tar xzvf R-3.3.3.tar.gz
     cd R-3.3.3
-
-    # requirements for R
-    yum -y install zlib-devel bzip2-devel bzip2-libs readline-devel \
-                   xz-devel xz-libs pcre-devel libcurl-devel \
-                   libpng-devel libjpeg-devel libtiff-devel openssl-devel
-    yum clean all
-
     ./configure --prefix=/usr/local --with-blas --with-lapack --with-x=no --enable-R-shlib
-    [ $PMAKE -eq 0 ] && make || make -j${PMAKE}
+    make
     make install
 
-    #
-    # R MODULES
-    #
+    # R modules
     cd $BUILD_DIR
     RMODULES=installer.R
     cat<<EOF>$RMODULES
@@ -128,8 +104,9 @@ biocValid()
 EOF
     R --slave -f $RMODULES
 
-    # CLEANUP
+    # cleanup
     cd / 
+    yum clean all
     rm -rf $BUILD_DIR
 
 # vim: syntax=sh:ts=4:sw=4:expandtab
