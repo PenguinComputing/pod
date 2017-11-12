@@ -1,0 +1,60 @@
+##############################################################################
+# README 
+#
+# === Create Container
+#
+# sudo singularity build --sandbox ./pod-bioconda ./pod-bioconda.def
+# sudo singularity build ./pod-bioconda.img ./pod-bioconda
+#
+# === Required POD Modules
+#
+# module load singularity/2.4
+#
+# === Provides in /usr/local
+#
+# Miniconda2    - https://repo.continuum.io/
+# Bioconda      - https://bioconda.github.io/ 
+#   
+# Bioconda Pacakges: 
+#   star sailfish fastqc kallisto subread bowtie2 bwa cramtools 
+#   blast trinity wkhtmltopdf samtools bamtools picard
+#
+#############################################################################
+
+Bootstrap: docker
+From: ubuntu:16.04
+
+%environment
+PATH=/usr/local/sbin:/usr/local/bin:$PATH
+LD_LIBRARY_PATH=/usr/local/lib64:/usr/local/lib:$LD_LIBRARY_PATH
+
+%labels
+AUTHOR Penguin Computing
+
+%post
+    BUILD_DIR=/tmp/build    # temp build folder inside the container
+
+    # apt
+    apt-get -y update
+    apt-get -y install wget git bzip2
+
+    # build environment
+    mkdir -p $BUILD_DIR && cd $BUILD_DIR
+
+    # miniconda
+    wget https://repo.continuum.io/miniconda/Miniconda2-4.3.14-Linux-x86_64.sh
+    bash Miniconda2-4.3.14-Linux-x86_64.sh -b -f -p /usr/local
+    conda update --yes conda
+
+    # bioconda
+    conda install --yes -c bioconda \
+        star sailfish fastqc kallisto subread bowtie2 bwa cramtools blast \
+        trinity wkhtmltopdf samtools bamtools picard
+
+    # cleanup
+    cd /
+    conda clean --index-cache --tarballs --packages --yes
+    apt-get -y clean
+    rm -rf $BUILD_DIR
+
+# vim: syntax=sh:ts=4:sw=4:expandtab

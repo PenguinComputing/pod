@@ -1,0 +1,59 @@
+##############################################################################
+# README 
+#
+# === Create Container
+#
+# sudo singularity build --sandbox ./pod-samtools ./pod-samtools.def
+# sudo singularity build ./pod-samtools.img ./pod-samtools
+#
+# === Required POD Modules
+#
+# module load singularity/2.4
+#
+# === Provides in /usr/local
+#
+# Samtools     - http://www.htslib.org/
+#
+#############################################################################
+
+Bootstrap: docker
+From: ubuntu:16.04
+
+%environment
+PATH=/usr/local/sbin:/usr/local/bin:$PATH
+LD_LIBRARY_PATH=/usr/local/lib64:/usr/local/lib:$LD_LIBRARY_PATH
+
+%labels
+AUTHOR Penguin Computing
+
+%post
+    BUILD_DIR=/tmp/build    # temp build folder inside the container
+
+    # apt
+    apt-get -y update
+    apt-get -y install wget git bzip2 make autoconf gcc \
+               zlib1g-dev libncurses5-dev libbz2-dev liblz-dev liblzma-dev
+
+    # build environment
+    mkdir -p $BUILD_DIR && cd $BUILD_DIR
+
+    # compile options
+    export CC=gcc CXX=g++
+    export CFLAGS='-mtune=native -march=native'
+    export CPPFLAGS='-mtune=native -march=native'
+
+    # samtools from source
+    git clone -b 1.6 https://github.com/samtools/htslib.git
+    git clone -b 1.6 https://github.com/samtools/samtools.git
+    cd samtools
+    autoheader 
+    autoconf -Wno-syntax
+    ./configure --prefix=/usr/local --with-htslib=../htslib
+    make && make install
+
+    # cleanup
+    cd /
+    apt-get -y clean
+    rm -rf $BUILD_DIR
+
+# vim: syntax=sh:ts=4:sw=4:expandtab

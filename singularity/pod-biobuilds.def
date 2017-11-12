@@ -1,0 +1,55 @@
+##############################################################################
+# README 
+#
+# === Create Container
+#
+# sudo singularity build --sandbox ./pod-biobuilds ./pod-biobuilds.def
+# sudo singularity build ./pod-biobuilds.img ./pod-biobuilds
+#
+# === Required POD Modules
+#
+# module load singularity/2.4
+#
+# === Provides in /usr/local
+#
+# Miniconda2    - https://repo.continuum.io/
+# BioBuilds     - https://biobuilds.org/
+#
+#############################################################################
+
+Bootstrap: docker
+From: ubuntu:16.04
+
+%environment
+PATH=/usr/local/sbin:/usr/local/bin:$PATH
+LD_LIBRARY_PATH=/usr/local/lib64:/usr/local/lib:$LD_LIBRARY_PATH
+
+%labels
+AUTHOR Penguin Computing
+
+%post
+    BUILD_DIR=/tmp/build    # temp build folder inside the container
+
+    # apt
+    apt-get -y update
+    apt-get -y install wget git bzip2
+
+    # build environment
+    mkdir -p $BUILD_DIR && cd $BUILD_DIR
+
+    # miniconda
+    cd $BUILD_DIR
+    wget https://repo.continuum.io/miniconda/Miniconda2-4.3.14-Linux-x86_64.sh
+    bash Miniconda2-4.3.14-Linux-x86_64.sh -b -f -p /usr/local
+    conda update --yes conda
+
+    # biobuilds  
+    conda install --yes -c biobuilds biobuilds
+
+    # cleanup
+    cd /
+    conda clean --index-cache --tarballs --packages --yes
+    apt-get -y clean
+    rm -rf $BUILD_DIR
+
+# vim: syntax=sh:ts=4:sw=4:expandtab
