@@ -5,6 +5,15 @@
 ### Bootstrap  Examples
 See the README comments in each bootstrap definition for instructions.
 
+* **pod-biobuilds.def**
+BioBuilds bioinformatics tools (Ubuntu 16)
+
+* **pod-bioconda.def**
+Bioconda bioinformatics tools (Ubuntu 16)
+
+* **pod-samtools.def**
+Samtools and HTSlib, built from source (Ubuntu 16)
+
 * **pod-centos7-R**
 CentOS 7 with R, common R modules and LAPACK/OpenBLAS support
 
