@@ -3,12 +3,12 @@
 #
 # === Create Container
 #
-# singularity create --size 900 ./pod-ubuntu16-ompi2.img
-# sudo singularity bootstrap ./pod-ubuntu16-ompi2.img ./pod-ubuntu16-ompi2.def
+# sudo singularity build --sandbox ./pod-ompi2-ubuntu16 ./pod-ompi2-ubuntu16.def
+# sudo singularity build ./pod-ompi2-ubuntu16.img ./pod-ompi2-ubuntu16
 #
 # === Required POD Modules
 #
-# module load singularity
+# module load singularity/2.4
 # module load openmpi/2.0.1/gcc.4.9.0
 #
 # === Required mpirun arguments
@@ -17,15 +17,13 @@
 #
 # === Provides
 #
-# OpenMPI 2.0.1: /usr/local/bin, /usr/local/lib
+# OpenMPI 2.0.1: /usr/local         - https://www.open-mpi.org/
 # MPI Example:   /usr/bin/mpi_ring
 #
 #############################################################################
 
-BootStrap: debootstrap
-OSVersion: xenial
-MirrorURL: http://archive.ubuntu.com/ubuntu/
-Include: software-properties-common
+Bootstrap: docker
+From: ubuntu:16.04
 
 %environment
 PATH=/usr/local/sbin:/usr/local/bin:$PATH
@@ -35,43 +33,32 @@ LD_LIBRARY_PATH=/usr/local/lib64:/usr/local/lib:$LD_LIBRARY_PATH
 AUTHOR Penguin Computing
 
 %post
-    ##########################################################################
-    # CONFIG AND PREP
-    ##########################################################################
-    
-    # CONFIG
     BUILD_DIR=/tmp/build    # temp build folder inside the container
-    PMAKE=2                 # 0 runs 'make', any other int runs 'make -j<int>'
 
-    # APT
-    add-apt-repository "deb http://archive.ubuntu.com/ubuntu xenial main restricted universe"
-    apt-get update
-    apt-get -y install apt-transport-https wget g++ gcc gfortran libtool libtool-bin make flex autoconf libpsm-infinipath1-dev libpsm-infinipath1
-    apt-get clean
+    # apt
+    apt-get -y update
+    apt-get -y install apt-transport-https wget g++ gcc gfortran libtool \
+                       libtool-bin make flex autoconf libpsm-infinipath1-dev \
+                       libpsm-infinipath1 uuid-dev libnuma-dev
 
-    # BUILD ENV
-    rm -rf $BUILD_DIR
-    mkdir -p $BUILD_DIR
+    # build environment
+    mkdir -p $BUILD_DIR && cd $BUILD_DIR
 
     export PATH=/usr/local/sbin:/usr/local/bin:$PATH
     export LD_LIBRARY_PATH=/usr/local/lib64:/usr/local/lib:$LD_LIBRARY_PATH
 
-    ##########################################################################
-    # APPLICATIONS
-    ##########################################################################
-
-    # OMPI
-    cd $BUILD_DIR
+    # openmpi
     wget -N https://www.open-mpi.org/software/ompi/v2.0/downloads/openmpi-2.0.1.tar.gz
     tar -xzvf openmpi-2.0.1.tar.gz
     cd openmpi-2.0.1
     ./configure --prefix=/usr/local
-    [ $PMAKE -eq 0 ] && make || make -j${PMAKE}
+    make -j3
     make install
     /usr/local/bin/mpicc examples/ring_c.c -o /usr/bin/mpi_ring
 
-    # CLEANUP
+    # cleanup
     cd / 
     rm -rf $BUILD_DIR
+    apt -y clean
 
 # vim: syntax=sh:ts=4:sw=4:expandtab

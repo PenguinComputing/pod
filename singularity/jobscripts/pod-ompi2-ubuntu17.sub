@@ -1,5 +1,5 @@
 #PBS -S /bin/bash
-#PBS -N pod-ubuntu17-ompi2
+#PBS -N pod-ompi2-ubuntu17
 #PBS -j oe
 #PBS -q B30
 #PBS -l nodes=2:ppn=28
@@ -11,10 +11,10 @@ echo "Cores:  $PBS_NP"
 echo "Nodes:  $(cat $PBS_NODEFILE | sort -u | tr '\n' ' ')"
 
 cd $PBS_O_WORKDIR
-module load singularity
+module load singularity/2.4
 module load openmpi/2.0.1/gcc.6.2.0
 
-SINGIMG="pod-ubuntu17-ompi2.img"
+SINGIMG="pod-ompi2-ubuntu17.img"
 
 mpirun singularity exec $SINGIMG /usr/bin/mpi_ring 
 exit $?
