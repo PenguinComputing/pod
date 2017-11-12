@@ -1,0 +1,60 @@
+##############################################################################
+# README 
+#
+# === Create Container
+#
+# sudo singularity build --sandbox ./pod-ompi2-centos7 ./pod-ompi2-centos7.def
+# sudo singularity build ./pod-ompi2-centos7.img ./pod-ompi2-centos7
+#
+# === Required POD Modules
+#
+# module load singularity/2.4
+# module load openmpi/2.0.1/gcc.4.8.5
+#
+# === Provides
+#
+# OpenMPI 2.0.1: /usr/local         - https://www.open-mpi.org/
+# MPI Example:   /usr/bin/mpi_ring
+#
+#############################################################################
+
+Bootstrap: docker
+From: centos:7
+
+%environment
+PATH=/usr/local/sbin:/usr/local/bin:$PATH
+LD_LIBRARY_PATH=/usr/local/lib64:/usr/local/lib:$LD_LIBRARY_PATH
+
+%labels
+AUTHOR Penguin Computing
+
+%post
+    BUILD_DIR=/tmp/build    # temp build folder inside the container
+
+    # yum
+    yum -y update
+    yum -y install gcc gcc-gfortran gcc-c++ libtool make flex autoconf \
+                   wget hostname infinipath-psm infinipath-psm-devel \
+                   libpsm2 libpsm2-devel
+
+    # build environment
+    mkdir -p $BUILD_DIR && cd $BUILD_DIR
+
+    export PATH=/usr/local/sbin:/usr/local/bin:$PATH
+    export LD_LIBRARY_PATH=/usr/local/lib64:/usr/local/lib:$LD_LIBRARY_PATH
+
+    # openmpi
+    wget -N https://www.open-mpi.org/software/ompi/v2.0/downloads/openmpi-2.0.1.tar.gz
+    tar -xzvf openmpi-2.0.1.tar.gz
+    cd openmpi-2.0.1
+    ./configure --prefix=/usr/local --with-psm --with-psm2
+    make
+    make install
+    /usr/local/bin/mpicc examples/ring_c.c -o /usr/bin/mpi_ring
+
+    # cleanup
+    cd / 
+    rm -rf $BUILD_DIR
+    yum clean all
+
+# vim: syntax=sh:ts=4:sw=4:expandtab
