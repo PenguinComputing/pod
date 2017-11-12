@@ -1,5 +1,5 @@
 #PBS -S /bin/bash
-#PBS -N pod-centos7-R
+#PBS -N pod-R-bioconductor
 #PBS -j oe
 #PBS -q B30
 #PBS -l nodes=1:ppn=28
@@ -11,10 +11,10 @@ echo "Cores:  $PBS_NP"
 echo "Nodes:  $(cat $PBS_NODEFILE | sort -u | tr '\n' ' ')"
 
 cd $PBS_O_WORKDIR
-module load singularity
+module load singularity/2.4
 
-SINGIMG="pod-centos7-R.img"
-RSCRIPT=$PBS_O_WORKDIR/pod-centos7-R-showinstalled.R
+SINGIMG="pod-R-bioconductor.img"
+RSCRIPT=$PBS_O_WORKDIR/pod-R-showinstalled.R
 
 cat<<EOF >$RSCRIPT
 str(ip <- installed.packages(.Library, priority = "high"))
