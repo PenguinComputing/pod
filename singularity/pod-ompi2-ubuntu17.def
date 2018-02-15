@@ -19,7 +19,7 @@
 #############################################################################
 
 Bootstrap: docker
-From: ubuntu:17.04
+From: ubuntu:17.10
 
 %environment
 PATH=/usr/local/sbin:/usr/local/bin:$PATH

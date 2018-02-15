@@ -11,7 +11,7 @@ echo "Cores:  $PBS_NP"
 echo "Nodes:  $(cat $PBS_NODEFILE | sort -u | tr '\n' ' ')"
 
 cd $PBS_O_WORKDIR
-module load singularity/2.4
+module load singularity/2.4.2
 module load openmpi/2.0.1/gcc.6.2.0
 
 SINGIMG="pod-ompi2-ubuntu17.img"
